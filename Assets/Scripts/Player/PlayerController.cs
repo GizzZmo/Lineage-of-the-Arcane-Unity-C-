@@ -44,7 +44,16 @@ public class PlayerController : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
         
         Vector3 movement = new Vector3(horizontal, 0f, vertical) * moveSpeed * Time.deltaTime;
-        transform.Translate(movement);
+        
+        // Use Rigidbody for physics-based movement when available
+        if (rb != null)
+        {
+            rb.MovePosition(transform.position + movement);
+        }
+        else
+        {
+            transform.Translate(movement);
+        }
     }
     
     void HandleCombatInput()

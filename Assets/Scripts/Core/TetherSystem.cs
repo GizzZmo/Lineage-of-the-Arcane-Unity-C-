@@ -36,6 +36,12 @@ public class TetherSystem : MonoBehaviour
             return;
         }
         
+        if (summon == null)
+        {
+            Debug.LogError("Cannot initiate tether: Summon is null!");
+            return;
+        }
+        
         activeSummon = summon;
         isTethered = true;
         activeSummon.OnSummon(player);
