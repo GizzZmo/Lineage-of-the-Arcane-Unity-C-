@@ -11,7 +11,39 @@ public abstract class MagicParent : MonoBehaviour
     public float tetherCostPerSecond = 5.0f; // How much Health/Sanity it costs
     [Range(0, 100)] public float defianceLevel = 0f; // Chance to ignore orders
 
+    [Header("Rampant Configuration")]
+    public RampantBehavior rampantBehavior = RampantBehavior.Aggressive;
+    public float rampantDuration = 30f;
+    public float rampantDamage = 15f;
+
     protected PlayerController boundPlayer;
+    protected RampantState rampantState;
+
+    protected virtual void Awake()
+    {
+        // Ensure RampantState component exists
+        rampantState = GetComponent<RampantState>();
+        if (rampantState == null)
+        {
+            rampantState = gameObject.AddComponent<RampantState>();
+        }
+        
+        // Configure rampant state based on this parent's settings
+        ConfigureRampantState();
+    }
+
+    /// <summary>
+    /// Configures the RampantState component with this Parent's settings.
+    /// </summary>
+    protected virtual void ConfigureRampantState()
+    {
+        if (rampantState != null)
+        {
+            rampantState.behavior = rampantBehavior;
+            rampantState.rampantDuration = rampantDuration;
+            rampantState.damagePerAttack = rampantDamage;
+        }
+    }
 
     /// <summary>
     /// Called when the player initiates the Tether.
@@ -37,10 +69,35 @@ public abstract class MagicParent : MonoBehaviour
     
     /// <summary>
     /// Called when the tether breaks.
-    /// Override this to implement specific rampant behavior.
+    /// Triggers the Rampant state behavior.
     /// </summary>
     public virtual void OnTetherBroken()
     {
         Debug.LogWarning($"{entityName} is now RAMPANT! The bond has been severed.");
+        
+        // Trigger rampant state
+        if (rampantState != null && boundPlayer != null)
+        {
+            rampantState.EnterRampantState(boundPlayer.transform);
+        }
+        
+        // Clear the bound player reference
+        boundPlayer = null;
+    }
+
+    /// <summary>
+    /// Checks if this Parent is currently in a rampant state.
+    /// </summary>
+    public bool IsRampant()
+    {
+        return rampantState != null && rampantState.isRampant;
+    }
+
+    /// <summary>
+    /// Gets the currently bound player.
+    /// </summary>
+    public PlayerController GetBoundPlayer()
+    {
+        return boundPlayer;
     }
 }
