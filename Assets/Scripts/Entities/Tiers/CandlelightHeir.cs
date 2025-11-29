@@ -55,19 +55,30 @@ public class CandlelightHeir : Heir
         // Create a soft point light effect
         Debug.Log("A gentle warmth spreads from Candlelight. You feel comforted.");
         
-        // In full implementation, would create/manage a point light
-        // For now, just log the effect
         CreateOrUpdateLight();
     }
     
+    /// <summary>
+    /// Creates or updates the Light component for the candle effect.
+    /// The Light component is created at runtime to provide the warm glow.
+    /// </summary>
     void CreateOrUpdateLight()
     {
-        // In a full implementation, this would create a Unity Light component
-        // pointLight = GetComponent<Light>() ?? gameObject.AddComponent<Light>();
-        // pointLight.type = LightType.Point;
-        // pointLight.color = candleGlow;
-        // pointLight.range = warmthRadius;
-        // pointLight.intensity = 1f;
+        // Get or create the Light component
+        if (pointLight == null)
+        {
+            pointLight = GetComponent<Light>();
+            if (pointLight == null)
+            {
+                pointLight = gameObject.AddComponent<Light>();
+            }
+        }
+        
+        // Configure the light for a candle-like effect
+        pointLight.type = LightType.Point;
+        pointLight.color = candleGlow;
+        pointLight.range = warmthRadius;
+        pointLight.intensity = 1f;
         
         Debug.Log("Candlelight illuminates the area with a soft glow.");
     }

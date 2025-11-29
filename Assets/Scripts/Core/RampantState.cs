@@ -31,8 +31,12 @@ public class RampantState : MonoBehaviour
     public float rampantStartTime;
     public Transform lastKnownPlayerPosition;
     
+    [Header("Performance Settings")]
+    public float targetRefreshInterval = 0.5f; // Time between target searches
+    
     private MagicParent parentEntity;
     private float lastAttackTime;
+    private float lastTargetRefreshTime;
     private Transform currentTarget;
     
     void Start()
@@ -98,8 +102,12 @@ public class RampantState : MonoBehaviour
     
     void PerformAggressiveBehavior()
     {
-        // Find and attack nearest target
-        FindNearestTarget();
+        // Find and attack nearest target (with caching to reduce performance impact)
+        if (Time.time - lastTargetRefreshTime > targetRefreshInterval)
+        {
+            FindNearestTarget();
+            lastTargetRefreshTime = Time.time;
+        }
         MoveTowardsTarget();
         TryAttackTarget();
     }
@@ -138,7 +146,11 @@ public class RampantState : MonoBehaviour
     void PerformDestructiveBehavior()
     {
         // Destroy environment objects (placeholder for actual implementation)
-        MoveTowardsTarget();
+        // Destructive behavior doesn't require a target - it damages the area
+        if (currentTarget != null)
+        {
+            MoveTowardsTarget();
+        }
         if (Time.time - lastAttackTime > attackInterval)
         {
             PerformAreaAttack();

@@ -117,11 +117,20 @@ public abstract class Heir : MagicParent
         }
     }
     
+    /// <summary>
+    /// Called when the tether breaks.
+    /// NOTE: Heirs intentionally do NOT call base.OnTetherBroken() because:
+    /// 1. Heirs are too weak to enter a rampant state
+    /// 2. They simply fade away instead of becoming hostile
+    /// 3. This prevents the RampantState from being triggered
+    /// The boundPlayer reference is intentionally not cleared here to allow
+    /// for potential rebinding mechanics in the future.
+    /// </summary>
     public override void OnTetherBroken()
     {
         // Heirs don't go rampant - they simply fade away
         Debug.Log($"Heir {entityName} fades away with a sad expression...");
-        // No base.OnTetherBroken() call - heirs don't trigger rampant state
+        // Intentionally NOT calling base.OnTetherBroken() - see method summary
     }
     
     /// <summary>

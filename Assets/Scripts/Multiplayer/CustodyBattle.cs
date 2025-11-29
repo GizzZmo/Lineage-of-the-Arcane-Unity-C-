@@ -93,16 +93,22 @@ public class CustodyBattle : MonoBehaviour
         // Update favor based on current actions
         UpdateFavorBasedOnActions();
         
-        // Clamp favor values
-        player1Favor = Mathf.Clamp(player1Favor, 0f, 100f);
-        player2Favor = Mathf.Clamp(player2Favor, 0f, 100f);
+        // Clamp favor values to ensure they stay non-negative
+        player1Favor = Mathf.Max(0f, player1Favor);
+        player2Favor = Mathf.Max(0f, player2Favor);
         
         // Normalize favor (should always add up to 100)
         float total = player1Favor + player2Favor;
-        if (total > 0)
+        if (total > 0.001f) // Use small epsilon to avoid floating point issues
         {
             player1Favor = (player1Favor / total) * 100f;
             player2Favor = (player2Favor / total) * 100f;
+        }
+        else
+        {
+            // If both are zero, reset to neutral
+            player1Favor = 50f;
+            player2Favor = 50f;
         }
     }
     

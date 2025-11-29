@@ -3,7 +3,9 @@ using UnityEngine;
 /// <summary>
 /// The Blueprint for all "Parents of Magic".
 /// This abstract class defines what a "Parent" is and handles personality traits.
+/// RequireComponent ensures the RampantState is always present on the GameObject.
 /// </summary>
+[RequireComponent(typeof(RampantState))]
 public abstract class MagicParent : MonoBehaviour
 {
     [Header("Entity Stats")]
@@ -21,12 +23,8 @@ public abstract class MagicParent : MonoBehaviour
 
     protected virtual void Awake()
     {
-        // Ensure RampantState component exists
+        // Get the RampantState component (guaranteed to exist via RequireComponent)
         rampantState = GetComponent<RampantState>();
-        if (rampantState == null)
-        {
-            rampantState = gameObject.AddComponent<RampantState>();
-        }
         
         // Configure rampant state based on this parent's settings
         ConfigureRampantState();
