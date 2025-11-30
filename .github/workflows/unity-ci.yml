@@ -78,77 +78,60 @@ jobs:
         run: |
           mkdir -p artifacts
           
-          # Generate asset manifest with metadata
+          # Generate asset manifest with metadata using Python for reliable JSON
           echo "=== Generating Asset Manifest ==="
-          cat > artifacts/asset-manifest.json << 'EOF'
-          {
-            "project": "Lineage of the Arcane",
-            "version": "${{ github.ref_name }}",
-            "build_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "commit_sha": "${{ github.sha }}",
-            "assets": {
-              "scripts": [],
-              "documentation": [],
-              "wiki": []
-            }
+          python3 << 'EOF'
+          import json
+          import os
+          from datetime import datetime, timezone
+          
+          def get_files_info(directory, extension):
+              files = []
+              if os.path.exists(directory):
+                  for root, _, filenames in os.walk(directory):
+                      for filename in filenames:
+                          if filename.endswith(extension):
+                              filepath = os.path.join(root, filename)
+                              files.append({
+                                  "path": filepath,
+                                  "size": os.path.getsize(filepath)
+                              })
+              return sorted(files, key=lambda x: x["path"])
+          
+          # Gather asset information
+          scripts = get_files_info("Assets/Scripts", ".cs")
+          docs = get_files_info("Assets/Docs", ".md")
+          wiki_pages = get_files_info("wiki", ".md")
+          
+          manifest = {
+              "project": "Lineage of the Arcane",
+              "version": os.environ.get("GITHUB_REF_NAME", "unknown"),
+              "build_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "commit_sha": os.environ.get("GITHUB_SHA", "unknown"),
+              "branch": os.environ.get("GITHUB_HEAD_REF") or os.environ.get("GITHUB_REF_NAME", "unknown"),
+              "repository": os.environ.get("GITHUB_REPOSITORY", "unknown"),
+              "assets": {
+                  "scripts": {
+                      "count": len(scripts),
+                      "files": scripts
+                  },
+                  "documentation": {
+                      "count": len(docs),
+                      "files": docs
+                  },
+                  "wiki": {
+                      "count": len(wiki_pages),
+                      "files": wiki_pages
+                  }
+              }
           }
+          
+          with open("artifacts/asset-manifest.json", "w") as f:
+              json.dump(manifest, f, indent=2)
+          
+          print("Asset manifest generated:")
+          print(json.dumps(manifest, indent=2))
           EOF
-          
-          # Create a proper manifest
-          echo '{' > artifacts/asset-manifest.json
-          echo '  "project": "Lineage of the Arcane",' >> artifacts/asset-manifest.json
-          echo '  "version": "'${{ github.ref_name }}'",' >> artifacts/asset-manifest.json
-          echo '  "build_date": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",' >> artifacts/asset-manifest.json
-          echo '  "commit_sha": "'${{ github.sha }}'",' >> artifacts/asset-manifest.json
-          echo '  "branch": "'${{ github.ref_name }}'",' >> artifacts/asset-manifest.json
-          echo '  "repository": "'${{ github.repository }}'",' >> artifacts/asset-manifest.json
-          echo '  "assets": {' >> artifacts/asset-manifest.json
-          
-          # Count scripts
-          script_count=$(find Assets/Scripts -name "*.cs" 2>/dev/null | wc -l)
-          echo '    "scripts": {' >> artifacts/asset-manifest.json
-          echo '      "count": '$script_count',' >> artifacts/asset-manifest.json
-          echo '      "files": [' >> artifacts/asset-manifest.json
-          find Assets/Scripts -name "*.cs" 2>/dev/null | sort | while read file; do
-            size=$(stat -c%s "$file" 2>/dev/null || echo "0")
-            echo '        {"path": "'$file'", "size": '$size'},' >> artifacts/asset-manifest.json
-          done
-          # Remove trailing comma and close array
-          sed -i '$ s/,$//' artifacts/asset-manifest.json
-          echo '      ]' >> artifacts/asset-manifest.json
-          echo '    },' >> artifacts/asset-manifest.json
-          
-          # Count documentation
-          doc_count=$(find Assets/Docs -name "*.md" 2>/dev/null | wc -l)
-          echo '    "documentation": {' >> artifacts/asset-manifest.json
-          echo '      "count": '$doc_count',' >> artifacts/asset-manifest.json
-          echo '      "files": [' >> artifacts/asset-manifest.json
-          find Assets/Docs -name "*.md" 2>/dev/null | sort | while read file; do
-            size=$(stat -c%s "$file" 2>/dev/null || echo "0")
-            echo '        {"path": "'$file'", "size": '$size'},' >> artifacts/asset-manifest.json
-          done
-          sed -i '$ s/,$//' artifacts/asset-manifest.json
-          echo '      ]' >> artifacts/asset-manifest.json
-          echo '    },' >> artifacts/asset-manifest.json
-          
-          # Count wiki pages
-          wiki_count=$(find wiki -name "*.md" 2>/dev/null | wc -l)
-          echo '    "wiki": {' >> artifacts/asset-manifest.json
-          echo '      "count": '$wiki_count',' >> artifacts/asset-manifest.json
-          echo '      "files": [' >> artifacts/asset-manifest.json
-          find wiki -name "*.md" 2>/dev/null | sort | while read file; do
-            size=$(stat -c%s "$file" 2>/dev/null || echo "0")
-            echo '        {"path": "'$file'", "size": '$size'},' >> artifacts/asset-manifest.json
-          done
-          sed -i '$ s/,$//' artifacts/asset-manifest.json
-          echo '      ]' >> artifacts/asset-manifest.json
-          echo '    }' >> artifacts/asset-manifest.json
-          
-          echo '  }' >> artifacts/asset-manifest.json
-          echo '}' >> artifacts/asset-manifest.json
-          
-          echo "Asset manifest generated:"
-          cat artifacts/asset-manifest.json
 
       - name: Create Assets Archive
         run: |
