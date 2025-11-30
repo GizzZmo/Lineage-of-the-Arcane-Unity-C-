@@ -1,0 +1,136 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sundays
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:csharp"
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  security-hardening:
+    name: Security Hardening Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "=== Scanning for potential hardcoded secrets ==="
+          
+          # Check for common secret patterns
+          PATTERNS=(
+            "password\s*=\s*['\"][^'\"]+['\"]"
+            "api[_-]?key\s*=\s*['\"][^'\"]+['\"]"
+            "secret\s*=\s*['\"][^'\"]+['\"]"
+            "token\s*=\s*['\"][^'\"]+['\"]"
+            "private[_-]?key"
+          )
+          
+          FOUND_ISSUES=false
+          
+          for pattern in "${PATTERNS[@]}"; do
+            echo "Checking pattern: $pattern"
+            if grep -riE "$pattern" --include="*.cs" --include="*.json" --include="*.yaml" --include="*.yml" . 2>/dev/null | grep -v ".git"; then
+              FOUND_ISSUES=true
+            fi
+          done
+          
+          if [ "$FOUND_ISSUES" = true ]; then
+            echo "⚠️ Warning: Potential secrets found. Please review."
+            exit 0  # Warning only, not failing the build
+          else
+            echo "✅ No hardcoded secrets detected."
+          fi
+
+      - name: Check file permissions
+        run: |
+          echo "=== Checking for sensitive file permissions ==="
+          find . -type f -name "*.cs" -perm /go+w 2>/dev/null && echo "⚠️ Some files have permissive write permissions" || echo "✅ File permissions look good"
+
+      - name: Validate workflow security
+        run: |
+          echo "=== Validating workflow security practices ==="
+          
+          # Check for pinned action versions
+          echo "Checking for unpinned actions..."
+          if grep -r "uses:.*@main\|uses:.*@master" .github/workflows/ 2>/dev/null; then
+            echo "⚠️ Warning: Some actions use unpinned versions (main/master)"
+          else
+            echo "✅ Actions appear to use specific versions"
+          fi
+          
+          # Check for write permissions
+          echo ""
+          echo "Checking for minimal permissions..."
+          if grep -r "permissions:" .github/workflows/ >/dev/null 2>&1; then
+            echo "✅ Workflows define explicit permissions"
+          else
+            echo "⚠️ Consider adding explicit permissions to workflows"
+          fi
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [codeql-analysis, security-hardening]
+    if: always()
+    
+    steps:
+      - name: Generate Security Summary
+        run: |
+          echo "# 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL Analysis | ${{ needs.codeql-analysis.result == 'success' && '✅ Passed' || '⚠️ Check Results' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Hardening | ${{ needs.security-hardening.result == 'success' && '✅ Passed' || '⚠️ Check Results' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Security scanning powered by GitHub CodeQL*" >> $GITHUB_STEP_SUMMARY

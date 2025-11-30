@@ -3,6 +3,9 @@
 > "Magic is not a tool. It is a family tree. And you are the youngest child."
 
 ![CI/CD](https://github.com/GizzZmo/Lineage-of-the-Arcane-Unity-C-/actions/workflows/unity-ci.yml/badge.svg)
+![Security](https://github.com/GizzZmo/Lineage-of-the-Arcane-Unity-C-/actions/workflows/security.yml/badge.svg)
+[![CodeQL](https://github.com/GizzZmo/Lineage-of-the-Arcane-Unity-C-/actions/workflows/security.yml/badge.svg?event=schedule)](https://github.com/GizzZmo/Lineage-of-the-Arcane-Unity-C-/security)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## 🔮 Project Overview
 
@@ -35,9 +38,17 @@ Assets/
 ├── Scripts/
 │   ├── Core/
 │   │   ├── MagicParent.cs      # Abstract base for all Parents
-│   │   └── TetherSystem.cs     # Health-drain mechanic
+│   │   ├── TetherSystem.cs     # Health-drain mechanic
+│   │   └── RampantState.cs     # Rampant AI behavior system
 │   ├── Entities/
-│   │   └── IgnisMater.cs       # Fire Mother implementation
+│   │   ├── IgnisMater.cs       # Fire Mother implementation
+│   │   └── Tiers/
+│   │       ├── Scion.cs        # Tier 1 base class
+│   │       ├── Heir.cs         # Tier 2 base class
+│   │       ├── EmberScion.cs   # Fire Scion implementation
+│   │       └── CandlelightHeir.cs  # Fire Heir implementation
+│   ├── Multiplayer/
+│   │   └── CustodyBattle.cs    # Multiplayer tug-of-war system
 │   └── Player/
 │       └── PlayerController.cs  # Player state and combat
 └── Docs/
@@ -56,7 +67,13 @@ Assets/
 |--------|---------|
 | `MagicParent.cs` | Abstract base class defining Parent entity behavior |
 | `TetherSystem.cs` | Manages health drain and tether connections |
+| `RampantState.cs` | Handles rampant AI behavior when tether breaks |
+| `Scion.cs` | Base class for Tier 1 entities |
+| `Heir.cs` | Base class for Tier 2 entities |
 | `IgnisMater.cs` | "Fire Mother" - aggressive temperament entity |
+| `EmberScion.cs` | Tier 1 fire scion implementation |
+| `CandlelightHeir.cs` | Tier 2 fire heir implementation |
+| `CustodyBattle.cs` | Multiplayer tug-of-war battle system |
 | `PlayerController.cs` | Player health, combat, and movement |
 
 ## 🚀 Roadmap
@@ -66,11 +83,14 @@ Assets/
 - [x] First entity: Ignis Mater
 - [x] Player controller with combat tracking
 - [x] CI/CD Pipeline with artifacts
-- [ ] Implement "Custody Battle" (Multiplayer tug-of-war)
-- [ ] Add Tier 1 (Scions) and Tier 2 (Heirs)
-- [ ] Create "Rampant" AI state when Tether breaks
+- [x] Security scanning with CodeQL
+- [x] Implement "Custody Battle" (Multiplayer tug-of-war)
+- [x] Add Tier 1 (Scions) and Tier 2 (Heirs)
+- [x] Create "Rampant" AI state when Tether breaks
 - [ ] Visual effects for tethering
 - [ ] Audio implementation
+- [ ] Additional Parents (Aqua Pater, Terra Mater)
+- [ ] UI systems (Health bar, Sanity indicator, Tether display)
 
 ## 🔄 CI/CD Pipeline
 
@@ -79,6 +99,14 @@ This project includes a GitHub Actions workflow that:
 - 📦 Packages scripts and documentation as artifacts
 - 📊 Generates code analysis reports
 - 🏷️ Creates releases automatically on version tags
+
+## 🔒 Security
+
+This project includes automated security scanning:
+- 🔍 **CodeQL Analysis**: Static analysis for C# vulnerabilities
+- 📋 **Dependency Review**: Checks for vulnerable dependencies on PRs
+- 🛡️ **Security Hardening**: Validates workflow security practices
+- 🔐 **Secret Scanning**: Detects potential hardcoded secrets
 
 ### Artifacts Generated
 - `scripts-package`: Core game scripts archive

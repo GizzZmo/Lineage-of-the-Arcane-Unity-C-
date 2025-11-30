@@ -15,6 +15,13 @@ public class IgnisMater : MagicParent
     {
         entityName = "Ignis Mater, The Combustion";
         tetherCostPerSecond = 10.0f; // High cost
+        
+        // Configure rampant behavior specific to Ignis
+        rampantBehavior = RampantBehavior.Aggressive;
+        rampantDuration = 45f; // Longer rampant duration
+        rampantDamage = 20f;   // High damage when rampant
+        
+        ConfigureRampantState();
     }
 
     protected override void ApplyEnvironmentalShift()
@@ -48,6 +55,8 @@ public class IgnisMater : MagicParent
     {
         base.OnTetherBroken();
         Debug.LogWarning("Ignis Mater erupts in fury! Everything burns!");
-        // Rampant behavior: Ignis attacks everything nearby
+        
+        // Intensify environmental effects during rampant state
+        RenderSettings.ambientLight = Color.red * 2f;
     }
 }

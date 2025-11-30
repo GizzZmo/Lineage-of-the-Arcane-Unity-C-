@@ -117,9 +117,17 @@ Players can strengthen bonds over time:
 Assets/Scripts/
 ├── Core/
 │   ├── MagicParent.cs     - Abstract base class for all entities
-│   └── TetherSystem.cs    - Manages tether logic and health drain
+│   ├── TetherSystem.cs    - Manages tether logic and health drain
+│   └── RampantState.cs    - Handles rampant AI behavior
 ├── Entities/
-│   └── IgnisMater.cs      - Fire Mother implementation
+│   ├── IgnisMater.cs      - Fire Mother implementation
+│   └── Tiers/
+│       ├── Scion.cs       - Tier 1 base class
+│       ├── Heir.cs        - Tier 2 base class
+│       ├── EmberScion.cs  - Fire Scion implementation
+│       └── CandlelightHeir.cs - Fire Heir implementation
+├── Multiplayer/
+│   └── CustodyBattle.cs   - Multiplayer tug-of-war system
 └── Player/
     └── PlayerController.cs - Player state and combat tracking
 ```
@@ -127,13 +135,25 @@ Assets/Scripts/
 ### Class Relationships
 ```
 MagicParent (Abstract)
-    ↳ IgnisMater
+    ↳ IgnisMater (Tier 0 - Parent)
+    ↳ Scion (Abstract - Tier 1)
+        ↳ EmberScion
+    ↳ Heir (Abstract - Tier 2)
+        ↳ CandlelightHeir
     ↳ (Future) AquaPater
     ↳ (Future) TerraMater
+
+RampantState
+    → Attached to MagicParent
+    → Manages rampant behavior
 
 TetherSystem
     → References MagicParent
     → References PlayerController
+
+CustodyBattle
+    → References MagicParent
+    → References multiple PlayerControllers
 
 PlayerController
     → Tracked by MagicParent instances
@@ -182,21 +202,22 @@ PlayerController
 - [x] TetherSystem implementation
 - [x] PlayerController
 - [x] Ignis Mater (first Parent)
+- [x] Security scanning (CodeQL)
 
-### Phase 2: Content Expansion
+### Phase 2: Content Expansion (In Progress)
 - [ ] Additional Parents (Aqua, Terra, Tempus)
-- [ ] Tier 1 Scions
-- [ ] Tier 2 Heirs
+- [x] Tier 1 Scions (Base class + Ember Scion)
+- [x] Tier 2 Heirs (Base class + Candlelight Heir)
 
 ### Phase 3: Polish
 - [ ] Visual effects for tethering
 - [ ] Audio implementation
 - [ ] UI systems
 
-### Phase 4: Advanced Features
-- [ ] Custody Battle multiplayer mode
+### Phase 4: Advanced Features ✅
+- [x] Custody Battle multiplayer mode
 - [ ] Evolution/Affinity system
-- [ ] Rampant AI behaviors
+- [x] Rampant AI behaviors
 
 ---
 
