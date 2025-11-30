@@ -64,10 +64,13 @@ public abstract class Heir : MagicParent
     
     /// <summary>
     /// Override tether maintained to add bonus affinity and faster growth.
+    /// Note: We do NOT call base.OnTetherMaintained() because we want complete control
+    /// over the affinity calculation for Heirs (using the multiplier instead of additive).
     /// </summary>
     public override void OnTetherMaintained(float deltaTime)
     {
         // Heirs give extra affinity due to their gentle nature
+        // Use multiplied time instead of base implementation to avoid double tracking
         float bonusTime = deltaTime * affinityGainMultiplier;
         AffinitySystem.Instance.AddTetherAffinity(entityId, bonusTime, isTemperamentSatisfied);
         
@@ -176,18 +179,16 @@ public abstract class Heir : MagicParent
     /// 1. Heirs are too weak to enter a rampant state
     /// 2. They simply fade away instead of becoming hostile
     /// 3. This prevents the RampantState from being triggered
-    /// However, we do record the betrayal in the affinity system but with reduced penalty.
+    /// However, we do record a reduced betrayal in the affinity system.
     /// </summary>
     public override void OnTetherBroken()
     {
         // Heirs don't go rampant - they simply fade away
         Debug.Log($"Heir {entityName} fades away with a sad expression...");
         
-        // Record a smaller betrayal penalty for heirs
-        // Direct affinity adjustment instead of full betrayal
-        AffinityData data = AffinitySystem.Instance.GetAffinityData(entityId);
-        data.currentAffinity = Mathf.Max(data.currentAffinity - 5f, 0f); // Much smaller penalty
-        data.UpdateLevel();
+        // Record a smaller betrayal penalty for heirs using the proper AffinitySystem method
+        // Heirs are forgiving, so the penalty is only 5 instead of the default 15
+        AffinitySystem.Instance.OnTetherBetrayalWithPenalty(entityId, 5f);
         
         // Intentionally NOT calling base.OnTetherBroken() - see method summary
     }
@@ -198,12 +199,12 @@ public abstract class Heir : MagicParent
     /// </summary>
     public override void OnTetherSeveredCleanly()
     {
-        base.OnTetherSeveredCleanly();
+        // Use the AffinitySystem method that includes a bonus (3 extra affinity for heirs)
+        // This handles all the proper event firing and level updates
+        AffinitySystem.Instance.OnSuccessfulTetherWithBonus(entityId, 3f);
         
-        // Heirs give a bonus for being dismissed gently
-        AffinityData data = AffinitySystem.Instance.GetAffinityData(entityId);
-        data.currentAffinity = Mathf.Min(data.currentAffinity + 3f, 100f); // Extra bonus
-        data.UpdateLevel();
+        // Clear the bound player reference (same as base would do)
+        boundPlayer = null;
         
         Debug.Log($"Heir {entityName} waves goodbye warmly, grateful for the gentle parting.");
     }

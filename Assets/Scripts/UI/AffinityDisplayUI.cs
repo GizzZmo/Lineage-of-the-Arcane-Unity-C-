@@ -49,12 +49,10 @@ public class AffinityDisplayUI : MonoBehaviour
     void Start()
     {
         // Subscribe to affinity events
-        if (AffinitySystem.Instance != null)
-        {
-            AffinitySystem.Instance.OnAffinityLevelChanged += HandleAffinityLevelChanged;
-            AffinitySystem.Instance.OnAffinityGained += HandleAffinityGained;
-            AffinitySystem.Instance.OnAbilityUnlocked += HandleAbilityUnlocked;
-        }
+        // The Instance property auto-creates if null, so we subscribe directly
+        AffinitySystem.Instance.OnAffinityLevelChanged += HandleAffinityLevelChanged;
+        AffinitySystem.Instance.OnAffinityGained += HandleAffinityGained;
+        AffinitySystem.Instance.OnAbilityUnlocked += HandleAbilityUnlocked;
         
         // Initialize UI state
         if (specialAbilityIcon != null)
@@ -67,12 +65,14 @@ public class AffinityDisplayUI : MonoBehaviour
     
     void OnDestroy()
     {
-        // Unsubscribe from events
-        if (AffinitySystem.Instance != null)
+        // Unsubscribe from events if the AffinitySystem still exists
+        // Note: During scene unload, the singleton may already be destroyed
+        AffinitySystem instance = FindObjectOfType<AffinitySystem>();
+        if (instance != null)
         {
-            AffinitySystem.Instance.OnAffinityLevelChanged -= HandleAffinityLevelChanged;
-            AffinitySystem.Instance.OnAffinityGained -= HandleAffinityGained;
-            AffinitySystem.Instance.OnAbilityUnlocked -= HandleAbilityUnlocked;
+            instance.OnAffinityLevelChanged -= HandleAffinityLevelChanged;
+            instance.OnAffinityGained -= HandleAffinityGained;
+            instance.OnAbilityUnlocked -= HandleAbilityUnlocked;
         }
     }
     

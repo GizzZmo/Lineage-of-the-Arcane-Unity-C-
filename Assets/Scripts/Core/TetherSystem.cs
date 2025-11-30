@@ -66,9 +66,9 @@ public class TetherSystem : MonoBehaviour
 
     void MaintainTether()
     {
-        // Use the affinity-modified tether cost
-        float cost = activeSummon.GetModifiedTetherCost() * Time.deltaTime;
+        // Use the affinity-modified tether cost (single call to avoid redundant calculations)
         currentTetherCost = activeSummon.GetModifiedTetherCost();
+        float cost = currentTetherCost * Time.deltaTime;
         
         if (player.currentHealth > cost)
         {

@@ -272,20 +272,59 @@ public class AffinitySystem : MonoBehaviour
     }
     
     /// <summary>
+    /// Called when a tether is successfully completed with a bonus amount.
+    /// Used by entities that grant extra affinity (like Heirs).
+    /// </summary>
+    /// <param name="entityId">The entity identifier.</param>
+    /// <param name="bonusAmount">Additional affinity bonus to add.</param>
+    public void OnSuccessfulTetherWithBonus(string entityId, float bonusAmount)
+    {
+        AffinityData data = GetAffinityData(entityId);
+        AffinityLevel previousLevel = data.level;
+        data.successfulTethers++;
+        
+        // Add clean sever bonus plus the entity-specific bonus
+        float totalBonus = cleanSeverBonus + bonusAmount;
+        
+        data.currentAffinity = Mathf.Min(data.currentAffinity + totalBonus, 100f);
+        data.UpdateLevel();
+        
+        Debug.Log($"[AFFINITY] Successful tether with {entityId} (bonus: {bonusAmount:F1}). Total: {data.successfulTethers}");
+        OnAffinityGained?.Invoke(entityId, totalBonus);
+        
+        if (data.level != previousLevel)
+        {
+            OnAffinityLevelChanged?.Invoke(entityId, data.level);
+            Debug.Log($"[AFFINITY] {entityId} affinity level changed to {data.level}!");
+        }
+    }
+    
+    /// <summary>
     /// Called when a tether is broken unexpectedly (betrayal).
     /// </summary>
     /// <param name="entityId">The entity identifier.</param>
     public void OnTetherBetrayal(string entityId)
     {
+        OnTetherBetrayalWithPenalty(entityId, betrayalPenalty);
+    }
+    
+    /// <summary>
+    /// Called when a tether is broken unexpectedly with a custom penalty.
+    /// Used by entities with reduced betrayal penalties (like Heirs).
+    /// </summary>
+    /// <param name="entityId">The entity identifier.</param>
+    /// <param name="penalty">The amount of affinity to lose.</param>
+    public void OnTetherBetrayalWithPenalty(string entityId, float penalty)
+    {
         AffinityData data = GetAffinityData(entityId);
         AffinityLevel previousLevel = data.level;
         
         data.betrayals++;
-        data.currentAffinity = Mathf.Max(data.currentAffinity - betrayalPenalty, 0f);
+        data.currentAffinity = Mathf.Max(data.currentAffinity - penalty, 0f);
         data.UpdateLevel();
         
-        Debug.LogWarning($"[AFFINITY] Betrayal with {entityId}! Affinity lost. Total betrayals: {data.betrayals}");
-        OnAffinityLost?.Invoke(entityId, betrayalPenalty);
+        Debug.LogWarning($"[AFFINITY] Betrayal with {entityId}! Lost {penalty:F1} affinity. Total betrayals: {data.betrayals}");
+        OnAffinityLost?.Invoke(entityId, penalty);
         
         if (data.level != previousLevel)
         {
