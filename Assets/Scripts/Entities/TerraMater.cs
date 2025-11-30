@@ -10,6 +10,7 @@ public class TerraMater : MagicParent
     [Header("Terra Settings")]
     public float rhythmWindow = 3.0f; // Expected interval between actions
     public float rhythmTolerance = 0.5f; // Acceptable deviation from rhythm
+    public float rhythmTimeoutMultiplier = 2.0f; // Multiplier for timeout grace period
     public float punishmentDamage = 6.0f;
     public Color ambientColor = new Color(0.6f, 0.4f, 0.2f); // Earthy brown
     public float gravityMultiplier = 1.5f; // Increases gravity by 50%
@@ -80,7 +81,7 @@ public class TerraMater : MagicParent
         }
         
         // Also punish if too much time passes without any action
-        if (hasStartedRhythm && Time.time - lastActionTime > rhythmWindow + rhythmTolerance * 2)
+        if (hasStartedRhythm && Time.time - lastActionTime > rhythmWindow + rhythmTolerance * rhythmTimeoutMultiplier)
         {
             PunishPlayer();
             hasStartedRhythm = false;

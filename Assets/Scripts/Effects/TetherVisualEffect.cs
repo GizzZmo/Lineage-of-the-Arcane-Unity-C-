@@ -18,6 +18,8 @@ public class TetherVisualEffect : MonoBehaviour
     public float pulseAmount = 0.02f;
     public Material tetherMaterial;
     
+    private static Material defaultTetherMaterial;
+    
     [Header("Color States")]
     public Color normalColor = new Color(0.4f, 0.6f, 1f); // Blue - normal state
     public Color strainedColor = new Color(1f, 0.8f, 0.2f); // Yellow - health is low
@@ -50,8 +52,12 @@ public class TetherVisualEffect : MonoBehaviour
         }
         else
         {
-            // Create a simple unlit material if none provided
-            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            // Use cached default material to avoid memory allocation
+            if (defaultTetherMaterial == null)
+            {
+                defaultTetherMaterial = new Material(Shader.Find("Sprites/Default"));
+            }
+            lineRenderer.material = defaultTetherMaterial;
         }
         
         lineRenderer.startColor = normalColor;

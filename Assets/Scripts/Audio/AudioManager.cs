@@ -19,6 +19,7 @@ public class AudioManager : MonoBehaviour
     [Range(0, 1)] public float musicVolume = 0.7f;
     [Range(0, 1)] public float ambientVolume = 0.8f;
     [Range(0, 1)] public float sfxVolume = 1f;
+    [Range(0, 1)] public float tetherVolumeMultiplier = 0.5f;
     
     [Header("Default Sounds")]
     public AudioClip tetherFormSound;
@@ -113,7 +114,7 @@ public class AudioManager : MonoBehaviour
         if (sfxSource != null)
             sfxSource.volume = sfxVolume * masterVolume;
         if (tetherSource != null)
-            tetherSource.volume = sfxVolume * masterVolume * 0.5f;
+            tetherSource.volume = sfxVolume * masterVolume * tetherVolumeMultiplier;
     }
     
     // ==================== Tether Sounds ====================

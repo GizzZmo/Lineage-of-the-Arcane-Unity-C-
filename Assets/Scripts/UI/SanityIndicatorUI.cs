@@ -151,7 +151,8 @@ public class SanityIndicatorUI : MonoBehaviour
     {
         if (sanityText != null && showNumbers)
         {
-            sanityText.text = $"Sanity: {Mathf.CeilToInt(player.currentSanity)}%";
+            float sanityPercent = (player.currentSanity / player.maxSanity) * 100f;
+            sanityText.text = $"Sanity: {Mathf.CeilToInt(sanityPercent)}%";
         }
     }
     

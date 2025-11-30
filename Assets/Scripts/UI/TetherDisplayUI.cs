@@ -157,6 +157,13 @@ public class TetherDisplayUI : MonoBehaviour
     {
         if (tetherSystem.player == null) return;
         
+        // Guard against division by zero
+        if (tetherSystem.player.maxHealth <= 0)
+        {
+            tetherStrength = 0f;
+            return;
+        }
+        
         // Calculate tether strength based on player health percentage
         float healthPercent = tetherSystem.player.currentHealth / tetherSystem.player.maxHealth;
         tetherStrength = Mathf.Clamp01(healthPercent);
