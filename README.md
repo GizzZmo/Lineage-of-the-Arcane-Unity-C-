@@ -70,28 +70,42 @@ Assets/
 │   │   ├── MagicParent.cs      # Abstract base for all Parents
 │   │   ├── TetherSystem.cs     # Health-drain mechanic
 │   │   ├── RampantState.cs     # Rampant AI behavior system
-│   │   └── AffinitySystem.cs   # Evolution/Affinity tracking
+│   │   ├── AffinitySystem.cs   # Evolution/Affinity tracking
+│   │   └── AchievementSystem.cs # Achievement milestones
 │   ├── Entities/
-│   │   ├── IgnisMater.cs       # Fire Mother implementation
-│   │   ├── AquaPater.cs        # Water Father implementation
-│   │   ├── TerraMater.cs       # Earth Mother implementation
+│   │   ├── IgnisMater.cs       # Fire Mother (Aggressive)
+│   │   ├── AquaPater.cs        # Water Father (Passive)
+│   │   ├── TerraMater.cs       # Earth Mother (Rhythmic)
+│   │   ├── TempusMater.cs      # Time Mother (Still)
+│   │   ├── DolorMater.cs       # Pain Mother (Sacrificial)
 │   │   └── Tiers/
 │   │       ├── Scion.cs        # Tier 1 base class
 │   │       ├── Heir.cs         # Tier 2 base class
-│   │       ├── EmberScion.cs   # Fire Scion implementation
-│   │       └── CandlelightHeir.cs  # Fire Heir implementation
+│   │       ├── EmberScion.cs   # Fire Scion
+│   │       ├── WaveScion.cs    # Water Scion
+│   │       ├── StoneScion.cs   # Earth Scion
+│   │       ├── ChronoScion.cs  # Time Scion
+│   │       ├── WoundScion.cs   # Pain Scion
+│   │       ├── CandlelightHeir.cs  # Fire Heir
+│   │       ├── DewdropHeir.cs  # Water Heir
+│   │       ├── PebbleHeir.cs   # Earth Heir
+│   │       ├── MomentHeir.cs   # Time Heir
+│   │       └── ScratchHeir.cs  # Pain Heir
 │   ├── Effects/
-│   │   └── TetherVisualEffect.cs   # Tether line renderer effects
+│   │   ├── TetherVisualEffect.cs   # Tether line renderer
+│   │   └── AffinityVisualEffect.cs # Affinity-based visuals
 │   ├── Audio/
 │   │   ├── AudioManager.cs     # Sound management system
-│   │   └── ParentAudioProfile.cs   # Audio configuration for Parents
+│   │   └── ParentAudioProfile.cs   # Audio configuration
 │   ├── UI/
 │   │   ├── HealthBarUI.cs      # Health bar display
-│   │   ├── SanityIndicatorUI.cs    # Sanity indicator display
+│   │   ├── SanityIndicatorUI.cs    # Sanity display
 │   │   ├── TetherDisplayUI.cs  # Tether status display
-│   │   └── AffinityDisplayUI.cs    # Affinity level display
+│   │   ├── AffinityDisplayUI.cs    # Affinity level display
+│   │   └── AchievementUI.cs    # Achievement display
 │   ├── Multiplayer/
-│   │   └── CustodyBattle.cs    # Multiplayer tug-of-war system
+│   │   ├── CustodyBattle.cs    # Tug-of-war system
+│   │   └── AffinityCompetition.cs  # Affinity competition
 │   └── Player/
 │       └── PlayerController.cs  # Player state and combat
 └── Docs/
@@ -112,22 +126,36 @@ Assets/
 | `TetherSystem.cs` | Manages health drain and tether connections |
 | `RampantState.cs` | Handles rampant AI behavior when tether breaks |
 | `AffinitySystem.cs` | Tracks player-entity relationships and provides benefits |
+| `AchievementSystem.cs` | Tracks achievements and milestones |
 | `Scion.cs` | Base class for Tier 1 entities |
 | `Heir.cs` | Base class for Tier 2 entities |
 | `IgnisMater.cs` | "Fire Mother" - aggressive temperament entity |
 | `AquaPater.cs` | "Water Father" - passive temperament entity |
 | `TerraMater.cs` | "Earth Mother" - rhythmic temperament entity |
-| `EmberScion.cs` | Tier 1 fire scion implementation |
-| `CandlelightHeir.cs` | Tier 2 fire heir implementation |
+| `TempusMater.cs` | "Time Mother" - still temperament entity |
+| `DolorMater.cs` | "Pain Mother" - sacrificial temperament entity |
+| `EmberScion.cs` | Fire Scion (Ignis lineage) |
+| `WaveScion.cs` | Water Scion (Aqua lineage) |
+| `StoneScion.cs` | Earth Scion (Terra lineage) |
+| `ChronoScion.cs` | Time Scion (Tempus lineage) |
+| `WoundScion.cs` | Pain Scion (Dolor lineage) |
+| `CandlelightHeir.cs` | Fire Heir (Ignis lineage) |
+| `DewdropHeir.cs` | Water Heir (Aqua lineage) |
+| `PebbleHeir.cs` | Earth Heir (Terra lineage) |
+| `MomentHeir.cs` | Time Heir (Tempus lineage) |
+| `ScratchHeir.cs` | Pain Heir (Dolor lineage) |
 | `CustodyBattle.cs` | Multiplayer tug-of-war battle system |
+| `AffinityCompetition.cs` | Multiplayer affinity competition system |
 | `PlayerController.cs` | Player health, combat, and movement |
 | `TetherVisualEffect.cs` | Line renderer for tether visualization |
+| `AffinityVisualEffect.cs` | Affinity-based entity visual changes |
 | `AudioManager.cs` | Singleton audio management system |
 | `ParentAudioProfile.cs` | ScriptableObject for Parent audio configuration |
 | `HealthBarUI.cs` | Health bar with burned health overlay |
 | `SanityIndicatorUI.cs` | Sanity display with peripheral effects |
 | `TetherDisplayUI.cs` | Tether status and temperament indicator |
 | `AffinityDisplayUI.cs` | Affinity level and progress display |
+| `AchievementUI.cs` | Achievement display and notifications |
 
 ## 🌟 Affinity System Details
 
@@ -149,6 +177,8 @@ Assets/
 | Ignis Mater | Inferno Embrace | 5s of invulnerability + AoE damage |
 | Aqua Pater | Tidal Sanctuary | 8s healing zone (5 HP/sec) |
 | Terra Mater | Earthen Bulwark | Absorbs 50 damage for 10s |
+| Tempus Mater | Temporal Stasis | 6s time freeze (except player) |
+| Dolor Mater | Martyrdom | 5s damage collection, 3x AoE explosion |
 
 ## 🚀 Roadmap
 
@@ -166,6 +196,12 @@ Assets/
 - [x] Additional Parents (Aqua Pater, Terra Mater)
 - [x] UI systems (Health bar, Sanity indicator, Tether display)
 - [x] Evolution/Affinity system with special abilities
+- [x] **New Parents (Tempus Mater, Dolor Mater)**
+- [x] **Scions for all lineages (Wave, Stone, Chrono, Wound)**
+- [x] **Heirs for all lineages (Dewdrop, Pebble, Moment, Scratch)**
+- [x] **Affinity-based visual changes for entities**
+- [x] **Multiplayer affinity competition**
+- [x] **Achievement system tied to affinity milestones**
 
 ## 🔄 CI/CD Pipeline
 

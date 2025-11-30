@@ -102,6 +102,12 @@ public abstract class Heir : MagicParent
             case "Terra":
             case "Earth":
                 return "TerraMater";
+            case "Tempus":
+            case "Time":
+                return "TempusMater";
+            case "Dolor":
+            case "Pain":
+                return "DolorMater";
             default:
                 return null;
         }

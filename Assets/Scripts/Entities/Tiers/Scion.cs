@@ -81,6 +81,12 @@ public abstract class Scion : MagicParent
             case "Terra Mater":
             case "Terra":
                 return "TerraMater";
+            case "Tempus Mater":
+            case "Tempus":
+                return "TempusMater";
+            case "Dolor Mater":
+            case "Dolor":
+                return "DolorMater";
             default:
                 return null;
         }

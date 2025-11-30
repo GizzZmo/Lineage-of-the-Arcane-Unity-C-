@@ -41,6 +41,7 @@ In this game, magic is not a resource to be spent—it's a relationship to be ma
 | Aggressive | Must attack frequently | Ignis Mater |
 | Passive | Must avoid combat | Aqua Pater |
 | Rhythmic | Must follow patterns | Terra Mater |
+| Still | Must wait patiently | Tempus Mater |
 | Sacrificial | Must take damage | Dolor Mater |
 
 **Punishment System:**
@@ -56,6 +57,8 @@ In this game, magic is not a resource to be spent—it's a relationship to be ma
 - **Ignis Mater:** Ambient light turns red, floor becomes hazardous
 - **Aqua Pater:** World becomes flooded, movement slowed
 - **Terra Mater:** Gravity increases, structures emerge
+- **Tempus Mater:** Time slows, purple temporal effects
+- **Dolor Mater:** Crimson pain aura, damage amplification
 
 ---
 
@@ -141,6 +144,21 @@ Each Parent unlocks a unique special ability when the player reaches Ascended af
 | Ignis Mater | Inferno Embrace | Temporary invulnerability with AoE damage (5s duration) | 30s |
 | Aqua Pater | Tidal Sanctuary | Creates a healing zone restoring 5 HP/sec (8s duration) | 45s |
 | Terra Mater | Earthen Bulwark | Protective barrier absorbing 50 damage (10s duration) | 60s |
+| Tempus Mater | Temporal Stasis | Freezes time for all except the player (6s duration) | 50s |
+| Dolor Mater | Martyrdom | Collects damage taken and releases as AoE explosion (5s collect, 3x multiplier) | 60s |
+
+### Affinity-Based Visual Changes
+
+Entities visually change based on their affinity level with the player:
+
+| Level | Visual Effect |
+|-------|---------------|
+| Hostile | Dim, shrunk (0.9x scale), dark red aura |
+| Stranger | Normal appearance, white aura |
+| Acquainted | Slight glow, yellow-white aura |
+| Bonded | Moderate glow, green aura |
+| Devoted | Strong glow + pulse effect, blue aura |
+| Ascended | Maximum glow + strong pulse, golden aura, 1.3x scale |
 
 ### Affinity Memory
 
@@ -161,39 +179,101 @@ A competitive mode where two players attempt to tether the same Parent:
 
 ---
 
+## Affinity Competition (Multiplayer)
+
+A new competitive mode where multiple players (2-4) compete to build affinity:
+
+### Scoring System
+| Action | Points |
+|--------|--------|
+| Reach Acquainted | +10 |
+| Reach Bonded | +25 |
+| Reach Devoted | +50 |
+| Reach Ascended | +100 |
+| Successful tether | +5 |
+| Betrayal | -10 |
+
+### Competition Rules
+- Default duration: 5 minutes
+- Can target specific entity or compete for overall affinity
+- Winner determined by highest score at end
+- Can be combined with Custody Battle for more intense gameplay
+
+---
+
+## Achievement System
+
+The achievement system tracks player progress and rewards milestones.
+
+### Achievement Categories
+
+| Category | Example | Reward |
+|----------|---------|--------|
+| Affinity Milestones | First Ascension | XP + cosmetic unlocks |
+| Entity Mastery | Master of Fire | Aura effects |
+| Tether Achievements | Master Tetherer (100 tethers) | XP |
+| Duration Achievements | Eternal Connection (300s) | XP |
+| Special Ability | Inferno Unleashed | XP |
+| Challenge | Perfect Partner (10 no-betrayal) | XP |
+| Multi-Entity | The Arcane Master | Title unlock |
+
+### Notable Achievements
+
+| Achievement | Requirement | Reward |
+|-------------|-------------|--------|
+| The Arcane Master | Ascended with all 5 Parents | 500 XP + Title |
+| Perfect Partner | 10 tethers without betrayal | 100 XP |
+| From the Ashes | Ascended after being Hostile | 200 XP (hidden) |
+
+---
+
 ## Technical Architecture
 
 ### Script Structure
 ```
 Assets/Scripts/
 ├── Core/
-│   ├── MagicParent.cs     - Abstract base class for all entities
-│   ├── TetherSystem.cs    - Manages tether logic and health drain
-│   ├── RampantState.cs    - Handles rampant AI behavior
-│   └── AffinitySystem.cs  - Manages player-entity relationships
+│   ├── MagicParent.cs        - Abstract base class for all entities
+│   ├── TetherSystem.cs       - Manages tether logic and health drain
+│   ├── RampantState.cs       - Handles rampant AI behavior
+│   ├── AffinitySystem.cs     - Manages player-entity relationships
+│   └── AchievementSystem.cs  - Tracks achievements and milestones
 ├── Entities/
-│   ├── IgnisMater.cs      - Fire Mother implementation
-│   ├── AquaPater.cs       - Water Father implementation
-│   ├── TerraMater.cs      - Earth Mother implementation
+│   ├── IgnisMater.cs         - Fire Mother implementation
+│   ├── AquaPater.cs          - Water Father implementation
+│   ├── TerraMater.cs         - Earth Mother implementation
+│   ├── TempusMater.cs        - Time Mother implementation
+│   ├── DolorMater.cs         - Pain Mother implementation
 │   └── Tiers/
-│       ├── Scion.cs       - Tier 1 base class
-│       ├── Heir.cs        - Tier 2 base class
-│       ├── EmberScion.cs  - Fire Scion implementation
-│       └── CandlelightHeir.cs - Fire Heir implementation
+│       ├── Scion.cs          - Tier 1 base class
+│       ├── Heir.cs           - Tier 2 base class
+│       ├── EmberScion.cs     - Fire Scion implementation
+│       ├── WaveScion.cs      - Water Scion implementation
+│       ├── StoneScion.cs     - Earth Scion implementation
+│       ├── ChronoScion.cs    - Time Scion implementation
+│       ├── WoundScion.cs     - Pain Scion implementation
+│       ├── CandlelightHeir.cs - Fire Heir implementation
+│       ├── DewdropHeir.cs    - Water Heir implementation
+│       ├── PebbleHeir.cs     - Earth Heir implementation
+│       ├── MomentHeir.cs     - Time Heir implementation
+│       └── ScratchHeir.cs    - Pain Heir implementation
 ├── Effects/
-│   └── TetherVisualEffect.cs - Line renderer for tether visualization
+│   ├── TetherVisualEffect.cs   - Line renderer for tether visualization
+│   └── AffinityVisualEffect.cs - Affinity-based entity visuals
 ├── Audio/
-│   ├── AudioManager.cs    - Singleton audio management system
+│   ├── AudioManager.cs       - Singleton audio management system
 │   └── ParentAudioProfile.cs - Audio configuration for Parents
 ├── UI/
-│   ├── HealthBarUI.cs     - Health bar with burned health overlay
-│   ├── SanityIndicatorUI.cs - Sanity display with peripheral effects
-│   ├── TetherDisplayUI.cs - Tether status and temperament indicator
-│   └── AffinityDisplayUI.cs - Affinity level and progress display
+│   ├── HealthBarUI.cs        - Health bar with burned health overlay
+│   ├── SanityIndicatorUI.cs  - Sanity display with peripheral effects
+│   ├── TetherDisplayUI.cs    - Tether status and temperament indicator
+│   ├── AffinityDisplayUI.cs  - Affinity level and progress display
+│   └── AchievementUI.cs      - Achievement display and notifications
 ├── Multiplayer/
-│   └── CustodyBattle.cs   - Multiplayer tug-of-war system
+│   ├── CustodyBattle.cs      - Multiplayer tug-of-war system
+│   └── AffinityCompetition.cs - Multiplayer affinity competition
 └── Player/
-    └── PlayerController.cs - Player state and combat tracking
+    └── PlayerController.cs   - Player state and combat tracking
 ```
 
 ### Class Relationships
@@ -202,16 +282,35 @@ MagicParent (Abstract)
     ↳ IgnisMater (Tier 0 - Parent, Aggressive)
     ↳ AquaPater (Tier 0 - Parent, Passive)
     ↳ TerraMater (Tier 0 - Parent, Rhythmic)
+    ↳ TempusMater (Tier 0 - Parent, Still)
+    ↳ DolorMater (Tier 0 - Parent, Sacrificial)
     ↳ Scion (Abstract - Tier 1)
-        ↳ EmberScion
+        ↳ EmberScion (Ignis lineage)
+        ↳ WaveScion (Aqua lineage)
+        ↳ StoneScion (Terra lineage)
+        ↳ ChronoScion (Tempus lineage)
+        ↳ WoundScion (Dolor lineage)
     ↳ Heir (Abstract - Tier 2)
-        ↳ CandlelightHeir
-    ↳ (Future) TempusMater
+        ↳ CandlelightHeir (Ignis lineage)
+        ↳ DewdropHeir (Aqua lineage)
+        ↳ PebbleHeir (Terra lineage)
+        ↳ MomentHeir (Tempus lineage)
+        ↳ ScratchHeir (Dolor lineage)
 
 AffinitySystem (Singleton)
     → Tracks all player-entity relationships
     → Provides tether cost modifiers
     → Manages affinity events and notifications
+
+AchievementSystem (Singleton)
+    → Tracks player achievements
+    → Listens to AffinitySystem events
+    → Manages achievement unlocks and rewards
+
+AffinityVisualEffect
+    → Attached to MagicParent entities
+    → Updates visual appearance based on affinity level
+    → Manages glow, scale, and particle effects
 
 RampantState
     → Attached to MagicParent
@@ -234,6 +333,11 @@ CustodyBattle
     → References MagicParent
     → References multiple PlayerControllers
 
+AffinityCompetition (Singleton)
+    → Manages multiplayer affinity competition
+    → Tracks competitor scores and standings
+    → Integrates with AffinitySystem events
+
 PlayerController
     → Tracked by MagicParent instances
 
@@ -242,6 +346,7 @@ UI Components
     → SanityIndicatorUI → References PlayerController
     → TetherDisplayUI → References TetherSystem
     → AffinityDisplayUI → References AffinitySystem, TetherSystem
+    → AchievementUI → References AchievementSystem
 ```
 
 ---
@@ -265,6 +370,12 @@ UI Components
 - Progress bar to next level
 - Special ability icon when unlocked
 - Session statistics (tethers, time spent)
+
+### Achievement Display
+- Achievement list with unlock status
+- Progress bars for incomplete achievements
+- Unlock notifications with animations
+- Overall completion percentage
 
 ---
 
@@ -315,12 +426,20 @@ UI Components
 - [x] Special abilities for Ascended affinity
 - [x] Cross-lineage affinity bonuses
 
-### Phase 5: Future Features (Planned)
-- [ ] Additional Parents (Tempus Mater, Dolor Mater)
-- [ ] More Scions and Heirs for each lineage
-- [ ] Affinity-based visual changes for entities
-- [ ] Multiplayer affinity competition
-- [ ] Achievement system tied to affinity milestones
+### Phase 5: Expanded Content ✅
+- [x] Additional Parents (Tempus Mater, Dolor Mater)
+- [x] More Scions for each lineage (Wave, Stone, Chrono, Wound)
+- [x] More Heirs for each lineage (Dewdrop, Pebble, Moment, Scratch)
+- [x] Affinity-based visual changes for entities
+- [x] Multiplayer affinity competition
+- [x] Achievement system tied to affinity milestones
+
+### Phase 6: Future Features (Planned)
+- [ ] Quest system
+- [ ] Procedural dungeon generation
+- [ ] Story campaign mode
+- [ ] Entity evolution/upgrade paths
+- [ ] New element lineages
 
 ---
 
